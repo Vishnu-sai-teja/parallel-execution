@@ -47,25 +47,37 @@ void solver(float* A){
     diff[(index + 1)%3] = 0.0 // initialise the valuse of the next iteation threds to 0 - in all and no overriding of this value - byt any thred.
     barrier.wait(myBarrier, NUM_PROCESSORS);
 
-    // ---- issue ----- some thereds can and compare the diff before all the threads have accumulated theid diff - need abarrier to stop all the threds going into comparision even before accumulating teh diff from all the threds
+    // ---- issue ----- some thereds can and compare the diff before all the threads
+    //  have accumulated theid diff - need abarrier to stop all the threds going into comparision 
+    // even before accumulating teh diff from all the threds
 
     if (diff[index] / (n*n) < threadhold){
       done = true;  // break the loop if the diff is less than the threshold - grid has converged.
     
-    index = (index + 1)%3; // use the next index value for teh diff - now ther eis no issue in teh overriding, just the issue is that the comparisioon shpould accumulat the whole diff instead of teh diff of the current threds - we still need the below barrier.
+    index = (index + 1)%3; 
+      /* use the next index value for teh diff - now ther eis no issue in 
+      teh overriding, just the issue is that the comparisioon shpould accumulat the whole diff 
+      instead of teh diff of the current threds - we still need the below barrier.
+      */
 
-    // ----- issue ----- some of threds even before comparision can go ahead and reset teh value of the diff to 0.0 anf the comparision comes to true asnd reset the done to truye dna break the loop.  
+    // ----- issue ----- some of threds even before comparision can go ahead and reset teh value of t
+    // he diff to 0.0 anf the comparision comes to true asnd reset the done to truye dna break the loop.  
     }
   }
   
 }
 
 /* ----- issue analysis ----- 
- -- thredas from previous iteration are late and these values may be reset byt teh threads taht are in teh next iteartion
- -- threds from teh current iteartion have processed teh diff but the threds in the prev iteartion to current iteration that are slow - might reset once teh values are updated by the fast threads
- -- shared variables in the fast threads is compared even before processing the diff from all the threds - so the comparision is wrong
+ -- thredas from previous iteration are late and these values may be reset byt teh 
+ threads taht are in teh next iteartion
+ -- threds from teh current iteartion have processed teh diff but the threds in the prev 
+ iteartion to current iteration that are slow - might reset once teh values are updated by the 
+ fast threads
+ -- shared variables in the fast threads is compared even before processing the dif
+ f from all the threds - so the comparision is wrong
 
 -- How to workaround this ?
--- -- use differnet difff variable for each of the iteartion - to keep the track of chnages iteration by iteartion differnet.
+-- -- use differnet difff variable for each of the iteartion - to keep the track of 
+chnages iteration by iteartion differnet.
 -- differnet diff variable - for each of the sucessive iteration - stored with the array.
 */
